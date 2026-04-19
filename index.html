@@ -1,171 +1,271 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIGITAL WILL | Secure & Viewable Vault</title>
+    <title>DIGITAL WILL | Ultimate Decentralized Legacy</title>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <style>
-        :root { --primary: #0f172a; --accent: #2563eb; --solana: #14F195; --bg: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 0; }
-        .navbar { background: var(--primary); color: white; padding: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: bold; }
-        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
-        h2 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        :root {
+            --primary: #0f172a; --accent: #2563eb; --success: #10b981; 
+            --danger: #f43f5e; --bg: #f8fafc; --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); margin: 0; line-height: 1.6; }
+        .header { background: var(--primary); color: white; padding: 2rem 1rem; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; letter-spacing: 3px; font-weight: 900; }
+        
+        .container { max-width: 900px; margin: -30px auto 50px; padding: 0 1rem; }
+        .card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 20px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid white; margin-bottom: 2rem; }
+        
+        h2 { font-size: 1.25rem; display: flex; align-items: center; gap: 12px; margin-top: 0; color: var(--accent); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 650px) { .grid { grid-template-columns: 1fr; } }
+
+        label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.85rem; text-transform: uppercase; color: #64748b; }
+        input, textarea, select { width: 100%; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 1rem; transition: 0.3s; box-sizing: border-box; }
+        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+
+        .file-zone { border: 2px dashed var(--accent); border-radius: 15px; padding: 30px; text-align: center; cursor: pointer; background: #eff6ff; transition: 0.3s; }
+        .file-zone:hover { background: #dbeafe; }
+
+        .btn { border: none; border-radius: 12px; padding: 16px 24px; font-weight: 700; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; width: 100%; }
         .btn-primary { background: var(--accent); color: white; }
-        .btn-unlock { background: var(--primary); color: white; }
-        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 5px; box-sizing: border-box; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+        .btn-secondary { background: var(--primary); color: white; }
+        .btn-danger { background: #fee2e2; color: var(--danger); margin-top: 20px; }
+
+        .status-badge { display: inline-block; padding: 6px 16px; border-radius: 30px; font-weight: 700; font-size: 0.8rem; background: #dcfce7; color: #166534; margin-bottom: 1rem; }
         .hidden { display: none; }
-        .preview-box { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 4px solid var(--accent); }
-        .asset-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid #e2e8f0; }
+        .preview-content { background: #f1f5f9; padding: 20px; border-radius: 12px; margin-top: 15px; border-left: 5px solid var(--accent); }
     </style>
 </head>
 <body>
 
-<div class="navbar">DIGITAL WILL PRO</div>
+<div class="header">
+    <h1>DIGITAL WILL</h1>
+    <p>Your Secure Legacy. Encrypted. Automated. Immortal.</p>
+</div>
 
 <div class="container">
-    
-    <div id="setup-section">
+
+    <div id="setup-view">
         <div class="card">
-            <h2><i class="fa-solid fa-user-shield"></i> ১. ভল্ট সেটিংস</h2>
-            <input type="password" id="masterKey" placeholder="মাস্টার পাসওয়ার্ড (এটিই চাবিকাঠি)">
-            <input type="email" id="beneficiaryEmail" placeholder="উত্তরাধিকারীর ইমেইল" style="margin-top: 10px;">
+            <h2><i class="fa-solid fa-shield-halved"></i> 1. Security & Destination</h2>
+            <div class="grid">
+                <div class="input-group">
+                    <label>Master Encryption Key</label>
+                    <input type="password" id="masterKey" placeholder="Minimum 8 characters">
+                </div>
+                <div class="input-group">
+                    <label>Beneficiary Email</label>
+                    <input type="email" id="targetEmail" placeholder="Who receives the data?">
+                </div>
+            </div>
         </div>
 
         <div class="card">
-            <h2><i class="fa-solid fa-cloud-arrow-up"></i> ২. ফাইল ও ডকুমেন্টস</h2>
-            <input type="file" id="fileInput" multiple onchange="processFiles(this.files)">
-            <div id="fileStatus" style="font-size: 0.8rem; margin-top: 10px; color: #64748b;"></div>
+            <h2><i class="fa-solid fa-folder-tree"></i> 2. Digital Assets & Files</h2>
+            <div class="grid">
+                <div class="input-group">
+                    <label>Financial & Legal Notes</label>
+                    <textarea id="notesFin" rows="4" placeholder="Bank logins, Vault PINs, Property details..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Digital & Crypto Assets</label>
+                    <textarea id="notesDig" rows="4" placeholder="Seed phrases, Social media logins, Subscriptions..."></textarea>
+                </div>
+            </div>
+            <label>Attach Documents (Photos, PDFs, Videos)</label>
+            <div class="file-zone" onclick="document.getElementById('fileInput').click()">
+                <i class="fa-solid fa-file-export" style="font-size: 2rem; color: var(--accent); margin-bottom: 10px;"></i>
+                <p>Click to upload your legacy files</p>
+                <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this.files)">
+            </div>
+            <div id="fileNameList" style="margin-top: 10px; font-size: 0.85rem; color: #64748b;"></div>
         </div>
 
         <div class="card">
-            <h2><i class="fa-solid fa-file-invoice"></i> ৩. গোপন তথ্য</h2>
-            <textarea id="secretNotes" rows="4" placeholder="আপনার ব্যাংক পাসওয়ার্ড বা জরুরি নোট এখানে লিখুন..."></textarea>
-            <button class="btn btn-primary" onclick="lockAndSave()">এনক্রিপ্ট এবং লক করুন</button>
+            <h2><i class="fa-solid fa-heartbeat"></i> 3. Trigger Configuration</h2>
+            <div class="grid">
+                <div class="input-group">
+                    <label>Inactivity Period (Trigger)</label>
+                    <select id="triggerPeriod">
+                        <option value="0.007">10 Minutes (For Testing)</option>
+                        <option value="30">30 Days</option>
+                        <option value="90">90 Days</option>
+                        <option value="365">1 Year</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Social Verification (Guardians)</label>
+                    <input type="text" id="guardians" placeholder="Guardian names or emails (optional)">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="sealVault()">
+                <i class="fa-solid fa-lock"></i> ENCRYPT & SEAL VAULT
+            </button>
         </div>
     </div>
 
-    <div id="active-section" class="hidden">
+    <div id="active-view" class="hidden">
         <div class="card" style="text-align: center;">
-            <h2 style="justify-content: center; color: green;"><i class="fa-solid fa-circle-check"></i> ভল্টটি বর্তমানে সুরক্ষিত</h2>
-            <p id="vaultStatusText"></p>
-            <button class="btn btn-primary" onclick="checkIn()">আমি সজাগ আছি (Check-In)</button>
-            <hr>
-            <p style="font-size: 0.9rem;">ভল্টের ভেতর কী আছে দেখতে চান?</p>
-            <input type="password" id="unlockKey" placeholder="মাস্টার পাসওয়ার্ড দিন">
-            <button class="btn btn-unlock" onclick="unlockVault()">ভল্ট আনলক করে দেখুন</button>
+            <div class="status-badge"><i class="fa-solid fa-shield-check"></i> VAULT STATUS: SEALED & ACTIVE</div>
+            <h1 id="countdownDisplay" style="font-size: 3.5rem; margin: 10px 0; color: var(--accent);">00</h1>
+            <p style="font-weight: 700; color: #64748b;">DAYS UNTIL AUTOMATED DELIVERY</p>
             
-            <div id="preview-area" class="hidden">
-                <div class="preview-box">
-                    <h3><i class="fa-solid fa-eye"></i> ভল্ট কন্টেন্ট:</h3>
-                    <p><strong>গোপন নোট:</strong> <span id="viewNotes"></span></p>
-                    <div id="viewFiles"></div>
+            <button class="btn btn-primary" onclick="checkIn()">
+                <i class="fa-solid fa-fingerprint"></i> I AM ALIVE (CHECK-IN)
+            </button>
+
+            <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                <p>Want to verify your data? Enter Master Key:</p>
+                <div class="grid">
+                    <input type="password" id="unlockKey" placeholder="Master Key">
+                    <button class="btn btn-secondary" onclick="unlockVault()">UNLOCK & PREVIEW</button>
+                </div>
+                
+                <div id="preview-area" class="hidden preview-content">
+                    <h3 style="margin-top: 0;">Verified Data:</h3>
+                    <p id="viewNotes" style="white-space: pre-wrap; text-align: left;"></p>
+                    <div id="viewFiles" style="text-align: left; border-top: 1px solid #cbd5e1; padding-top: 10px;"></div>
                 </div>
             </div>
 
-            <button class="btn" style="background: #fee2e2; color: #dc2626; margin-top: 20px;" onclick="resetVault()">ভল্ট ডিলিট করুন</button>
+            <button class="btn btn-danger" onclick="deleteVault()">DESTROY VAULT FOREVER</button>
         </div>
     </div>
-
 </div>
 
 <script>
-    let tempFiles = [];
+    // Initialize EmailJS (Replace 'YOUR_PUBLIC_KEY' with your actual key from emailjs.com)
+    (function(){
+        emailjs.init("YOUR_PUBLIC_KEY"); 
+    })();
 
-    // ফাইলগুলোকে মেমরিতে নেওয়া
-    function processFiles(files) {
-        tempFiles = [];
-        document.getElementById('fileStatus').innerHTML = "প্রসেসিং হচ্ছে...";
-        for (let file of files) {
+    let vaultFiles = [];
+
+    function handleFiles(files) {
+        vaultFiles = [];
+        const list = document.getElementById('fileNameList');
+        list.innerHTML = "<strong>Ready to encrypt:</strong> ";
+        for (let f of files) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                tempFiles.push({ name: file.name, type: file.type, data: e.target.result });
-                document.getElementById('fileStatus').innerHTML += `<div>✅ ${file.name} রেডি।</div>`;
+                vaultFiles.push({ name: f.name, data: e.target.result });
+                list.innerHTML += f.name + ", ";
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(f);
         }
     }
 
-    // এনক্রিপ্ট করে সেভ করা
-    function lockAndSave() {
+    function sealVault() {
         const key = document.getElementById('masterKey').value;
-        const email = document.getElementById('beneficiaryEmail').value;
-        const notes = document.getElementById('secretNotes').value;
+        const email = document.getElementById('targetEmail').value;
+        if(key.length < 8 || !email) { alert("Please set a strong Master Key (8+ chars) and Beneficiary Email."); return; }
 
-        if(!key || !email) { alert("পাসওয়ার্ড এবং ইমেইল দিন!"); return; }
-
-        const vaultData = { notes: notes, files: tempFiles };
-        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(vaultData), key).toString();
-
-        const config = {
-            payload: encrypted,
-            beneficiary: email,
-            lastSeen: Date.now(),
-            interval: 30 * 24 * 60 * 60 * 1000 // ৩০ দিন
+        const rawData = {
+            fin: document.getElementById('notesFin').value,
+            dig: document.getElementById('notesDig').value,
+            files: vaultFiles
         };
 
-        localStorage.setItem('digital_will_v2', JSON.stringify(config));
-        alert("ভল্ট লক করা হয়েছে!");
+        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(rawData), key).toString();
+        
+        const vaultConfig = {
+            payload: encrypted,
+            email: email,
+            duration: parseFloat(document.getElementById('triggerPeriod').value) * 24 * 60 * 60 * 1000,
+            lastCheckIn: Date.now(),
+            triggered: false
+        };
+
+        localStorage.setItem('digital_will_global', JSON.stringify(vaultConfig));
+        alert("Vault sealed successfully. The countdown has begun.");
         render();
     }
 
-    // ভল্ট আনলক করে দেখা
+    function checkIn() {
+        let config = JSON.parse(localStorage.getItem('digital_will_global'));
+        config.lastCheckIn = Date.now();
+        config.triggered = false;
+        localStorage.setItem('digital_will_global', JSON.stringify(config));
+        alert("Check-in successful! Stay safe.");
+        render();
+    }
+
     function unlockVault() {
         const key = document.getElementById('unlockKey').value;
-        const stored = JSON.parse(localStorage.getItem('digital_will_v2'));
-
+        const config = JSON.parse(localStorage.getItem('digital_will_global'));
+        
         try {
-            const bytes = CryptoJS.AES.decrypt(stored.payload, key);
-            const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-            // শো ডেটা
-            document.getElementById('preview-area').classList.remove('hidden');
-            document.getElementById('viewNotes').innerText = decryptedData.notes;
+            const bytes = CryptoJS.AES.decrypt(config.payload, key);
+            const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
             
-            const fileContainer = document.getElementById('viewFiles');
-            fileContainer.innerHTML = "<strong>সংরক্ষিত ফাইল:</strong>";
-            decryptedData.files.forEach(f => {
-                fileContainer.innerHTML += `
-                    <div class="asset-item">
-                        <i class="fa-solid fa-file"></i> 
-                        <a href="${f.data}" target="_blank">${f.name}</a> (ক্লিক করে দেখুন)
-                    </div>`;
+            const preview = document.getElementById('preview-area');
+            preview.classList.remove('hidden');
+            document.getElementById('viewNotes').innerText = "FINANCIAL:\n" + decrypted.fin + "\n\nDIGITAL:\n" + decrypted.dig;
+            
+            const fileList = document.getElementById('viewFiles');
+            fileList.innerHTML = "<strong>ATTACHMENTS:</strong><br>";
+            decrypted.files.forEach(f => {
+                fileList.innerHTML += `<a href="${f.data}" target="_blank" style="color:var(--accent); display:block; margin: 5px 0;">📂 ${f.name}</a>`;
             });
         } catch (e) {
-            alert("ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।");
+            alert("Invalid Master Key!");
         }
     }
 
     function render() {
-        const stored = localStorage.getItem('digital_will_v2');
+        const stored = localStorage.getItem('digital_will_global');
         if(stored) {
-            document.getElementById('setup-section').classList.add('hidden');
-            document.getElementById('active-section').classList.remove('hidden');
-            const data = JSON.parse(stored);
-            const daysLeft = Math.ceil(((data.lastSeen + data.interval) - Date.now()) / (1000 * 60 * 60 * 24));
-            document.getElementById('vaultStatusText').innerText = `পরবর্তী চেক-ইন ${daysLeft} দিনের মধ্যে করতে হবে।`;
+            document.getElementById('setup-view').classList.add('hidden');
+            document.getElementById('active-view').classList.remove('hidden');
+            
+            const config = JSON.parse(stored);
+            const expiry = config.lastCheckIn + config.duration;
+            const msLeft = expiry - Date.now();
+            
+            if(msLeft <= 0 && !config.triggered) {
+                triggerDelivery(config);
+            }
+
+            const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+            document.getElementById('countdownDisplay').innerText = daysLeft <= 0 ? "!!" : daysLeft;
         }
     }
 
-    function checkIn() {
-        let data = JSON.parse(localStorage.getItem('digital_will_v2'));
-        data.lastSeen = Date.now();
-        localStorage.setItem('digital_will_v2', JSON.stringify(data));
-        alert("চেক-ইন সফল!");
-        render();
+    function triggerDelivery(config) {
+        // Mark as triggered so it doesn't send infinite emails
+        config.triggered = true;
+        localStorage.setItem('digital_will_global', JSON.stringify(config));
+
+        // Logic to send email via EmailJS
+        const templateParams = {
+            to_email: config.email,
+            message: "A secure Digital Will vault has been triggered for you. Please contact the owner's legal guardians for the Master Key to unlock the encrypted data."
+        };
+
+        emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+            .then(() => { console.log('Legacy email sent successfully!'); })
+            .catch((err) => { console.error('Email failed:', err); });
+        
+        alert("The vault trigger period has expired. Beneficiary notification sent.");
     }
 
-    function resetVault() {
-        if(confirm("সব ফাইল মুছে যাবে। নিশ্চিত?")) {
-            localStorage.removeItem('digital_will_v2');
+    function deleteVault() {
+        if(confirm("DANGER: This will permanently destroy your legacy vault. Proceed?")) {
+            localStorage.removeItem('digital_will_global');
             location.reload();
         }
     }
 
     window.onload = render;
+    setInterval(render, 60000); // Check every minute
 </script>
 
 </body>
