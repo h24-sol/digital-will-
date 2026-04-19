@@ -3,168 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIGITAL WILL | Web3 & Blockchain Edition</title>
+    <title>DIGITAL WILL | Secure & Viewable Vault</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <style>
-        :root { --primary: #1a1a2e; --accent: #9945FF; --solana: #14F195; --bg: #0f0f1b; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #e2e8f0; margin: 0; }
-        .navbar { background: var(--primary); padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); }
-        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-        .card { background: #16213e; border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem; border: 1px solid #243447; }
-        h2 { color: var(--solana); font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-        .input-group { margin-bottom: 1rem; }
-        input, textarea, select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; }
-        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
-        .btn-wallet { background: var(--accent); color: white; width: auto; }
-        .btn-save { background: var(--solana); color: #1a1a2e; margin-top: 20px; font-size: 1.1rem; }
-        .file-box { border: 2px dashed var(--accent); padding: 20px; text-align: center; border-radius: 10px; margin: 10px 0; }
+        :root { --primary: #0f172a; --accent: #2563eb; --solana: #14F195; --bg: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 0; }
+        .navbar { background: var(--primary); color: white; padding: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: bold; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        h2 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-unlock { background: var(--primary); color: white; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 5px; box-sizing: border-box; }
         .hidden { display: none; }
-        .status-badge { background: #14F19522; color: var(--solana); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
+        .preview-box { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 4px solid var(--accent); }
+        .asset-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid #e2e8f0; }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div><i class="fa-solid fa-infinity"></i> DIGITAL WILL</div>
-    <button class="btn btn-wallet" id="connectBtn" onclick="connectWallet()">Connect Solana Wallet</button>
-</div>
+<div class="navbar">DIGITAL WILL PRO</div>
 
 <div class="container">
-    <div id="setup-ui">
+    
+    <div id="setup-section">
         <div class="card">
-            <h2><i class="fa-solid fa-lock"></i> Encryption Layer</h2>
-            <div class="input-group">
-                <label>Encryption Key (আপনার গোপন পাসওয়ার্ড):</label>
-                <input type="password" id="masterKey" placeholder="এই পাসওয়ার্ড ছাড়া কেউ ভল্ট খুলতে পারবে না">
-            </div>
+            <h2><i class="fa-solid fa-user-shield"></i> ১. ভল্ট সেটিংস</h2>
+            <input type="password" id="masterKey" placeholder="মাস্টার পাসওয়ার্ড (এটিই চাবিকাঠি)">
+            <input type="email" id="beneficiaryEmail" placeholder="উত্তরাধিকারীর ইমেইল" style="margin-top: 10px;">
         </div>
 
         <div class="card">
-            <h2><i class="fa-solid fa-photo-film"></i> Upload Assets (Docs/Photos/Videos)</h2>
-            <div class="file-box" onclick="document.getElementById('fileInput').click()">
-                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; margin-bottom: 10px;"></i>
-                <p>ক্লিক করে ফাইল আপলোড করুন (PDF, MP4, JPG)</p>
-                <input type="file" id="fileInput" class="hidden" multiple onchange="previewFiles(this.files)">
-            </div>
-            <div id="filePreview" style="font-size: 0.8rem; color: #94a3b8;"></div>
+            <h2><i class="fa-solid fa-cloud-arrow-up"></i> ২. ফাইল ও ডকুমেন্টস</h2>
+            <input type="file" id="fileInput" multiple onchange="processFiles(this.files)">
+            <div id="fileStatus" style="font-size: 0.8rem; margin-top: 10px; color: #64748b;"></div>
         </div>
 
         <div class="card">
-            <h2><i class="fa-solid fa-list-check"></i> Vault Data</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <textarea id="finData" rows="4" placeholder="আর্থিক তথ্য (Bank/Locker)"></textarea>
-                <textarea id="digData" rows="4" placeholder="ডিজিটাল সম্পদ (Social/Crypto)"></textarea>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2><i class="fa-solid fa-clock"></i> Dead Man's Switch Logic</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <input type="email" id="targetEmail" placeholder="উত্তরাধিকারীর ইমেইল">
-                <select id="triggerPeriod">
-                    <option value="30">৩০ দিন পর (Daily Check-in)</option>
-                    <option value="90">৯০ দিন পর</option>
-                    <option value="365">১ বছর পর</option>
-                </select>
-            </div>
-            <button class="btn btn-save" onclick="encryptAndSave()">এনক্রিপ্ট এবং চেইনে সেভ করুন</button>
+            <h2><i class="fa-solid fa-file-invoice"></i> ৩. গোপন তথ্য</h2>
+            <textarea id="secretNotes" rows="4" placeholder="আপনার ব্যাংক পাসওয়ার্ড বা জরুরি নোট এখানে লিখুন..."></textarea>
+            <button class="btn btn-primary" onclick="lockAndSave()">এনক্রিপ্ট এবং লক করুন</button>
         </div>
     </div>
 
-    <div id="active-ui" class="hidden">
-        <div class="card" style="text-align: center; border: 2px solid var(--solana);">
-            <h1 style="color: var(--solana);"><i class="fa-solid fa-shield-heart"></i> ভল্ট সুরক্ষিত আছে</h1>
-            <p id="vaultInfo"></p>
-            <p id="countdown" style="font-size: 2rem; font-weight: 800; color: var(--accent);"></p>
-            <button class="btn btn-save" onclick="checkIn()">আমি সজাগ আছি (Check-In)</button>
-            <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">আপনার ফাইলগুলো এনক্রিপ্ট হয়ে IPFS এবং Solana চেইনে রেকর্ড করা হয়েছে।</p>
+    <div id="active-section" class="hidden">
+        <div class="card" style="text-align: center;">
+            <h2 style="justify-content: center; color: green;"><i class="fa-solid fa-circle-check"></i> ভল্টটি বর্তমানে সুরক্ষিত</h2>
+            <p id="vaultStatusText"></p>
+            <button class="btn btn-primary" onclick="checkIn()">আমি সজাগ আছি (Check-In)</button>
+            <hr>
+            <p style="font-size: 0.9rem;">ভল্টের ভেতর কী আছে দেখতে চান?</p>
+            <input type="password" id="unlockKey" placeholder="মাস্টার পাসওয়ার্ড দিন">
+            <button class="btn btn-unlock" onclick="unlockVault()">ভল্ট আনলক করে দেখুন</button>
+            
+            <div id="preview-area" class="hidden">
+                <div class="preview-box">
+                    <h3><i class="fa-solid fa-eye"></i> ভল্ট কন্টেন্ট:</h3>
+                    <p><strong>গোপন নোট:</strong> <span id="viewNotes"></span></p>
+                    <div id="viewFiles"></div>
+                </div>
+            </div>
+
+            <button class="btn" style="background: #fee2e2; color: #dc2626; margin-top: 20px;" onclick="resetVault()">ভল্ট ডিলিট করুন</button>
         </div>
     </div>
+
 </div>
 
 <script>
-    let walletAddress = null;
-    let selectedFiles = [];
+    let tempFiles = [];
 
-    // কানেক্ট সোয়ানা ওয়ালেট (Phantom/Solflare)
-    async function connectWallet() {
-        if (window.solana && window.solana.isPhantom) {
-            try {
-                const response = await window.solana.connect();
-                walletAddress = response.publicKey.toString();
-                document.getElementById('connectBtn').innerText = walletAddress.slice(0,6) + "..." + walletAddress.slice(-4);
-                document.getElementById('connectBtn').style.background = "#14F195";
-            } catch (err) { console.error(err); }
-        } else { alert("দয়া করে Phantom Wallet ইনস্টল করুন!"); }
-    }
-
-    function previewFiles(files) {
-        selectedFiles = [];
-        const preview = document.getElementById('filePreview');
-        preview.innerHTML = "";
-        for(let f of files) {
+    // ফাইলগুলোকে মেমরিতে নেওয়া
+    function processFiles(files) {
+        tempFiles = [];
+        document.getElementById('fileStatus').innerHTML = "প্রসেসিং হচ্ছে...";
+        for (let file of files) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                selectedFiles.push({ name: f.name, content: e.target.result });
-                preview.innerHTML += `<div>✅ ${f.name}</div>`;
+                tempFiles.push({ name: file.name, type: file.type, data: e.target.result });
+                document.getElementById('fileStatus').innerHTML += `<div>✅ ${file.name} রেডি।</div>`;
             };
-            reader.readAsDataURL(f);
+            reader.readAsDataURL(file);
         }
     }
 
-    async function encryptAndSave() {
+    // এনক্রিপ্ট করে সেভ করা
+    function lockAndSave() {
         const key = document.getElementById('masterKey').value;
-        const email = document.getElementById('targetEmail').value;
+        const email = document.getElementById('beneficiaryEmail').value;
+        const notes = document.getElementById('secretNotes').value;
 
         if(!key || !email) { alert("পাসওয়ার্ড এবং ইমেইল দিন!"); return; }
-        if(!walletAddress) { alert("দয়া করে ওয়ালেট কানেক্ট করুন!"); return; }
 
-        const rawData = {
-            fin: document.getElementById('finData').value,
-            dig: document.getElementById('digData').value,
-            files: selectedFiles
-        };
+        const vaultData = { notes: notes, files: tempFiles };
+        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(vaultData), key).toString();
 
-        // AES Encryption (Zero-Knowledge)
-        const encryptedStr = CryptoJS.AES.encrypt(JSON.stringify(rawData), key).toString();
-
-        const finalVault = {
-            owner: walletAddress,
-            data: encryptedStr,
+        const config = {
+            payload: encrypted,
             beneficiary: email,
-            duration: document.getElementById('triggerPeriod').value * 24 * 60 * 60 * 1000,
-            lastSeen: Date.now()
+            lastSeen: Date.now(),
+            interval: 30 * 24 * 60 * 60 * 1000 // ৩০ দিন
         };
 
-        localStorage.setItem('solana_digital_will', JSON.stringify(finalVault));
-        alert("সফল! আপনার ভল্টটি এনক্রিপ্ট করা হয়েছে এবং রেকর্ড সংরক্ষিত হয়েছে।");
-        renderUI();
+        localStorage.setItem('digital_will_v2', JSON.stringify(config));
+        alert("ভল্ট লক করা হয়েছে!");
+        render();
     }
 
-    function renderUI() {
-        const stored = localStorage.getItem('solana_digital_will');
-        if(stored) {
-            const vault = JSON.parse(stored);
-            document.getElementById('setup-ui').classList.add('hidden');
-            document.getElementById('active-ui').classList.remove('hidden');
+    // ভল্ট আনলক করে দেখা
+    function unlockVault() {
+        const key = document.getElementById('unlockKey').value;
+        const stored = JSON.parse(localStorage.getItem('digital_will_v2'));
+
+        try {
+            const bytes = CryptoJS.AES.decrypt(stored.payload, key);
+            const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+            // শো ডেটা
+            document.getElementById('preview-area').classList.remove('hidden');
+            document.getElementById('viewNotes').innerText = decryptedData.notes;
             
-            const remaining = Math.ceil(((vault.lastSeen + vault.duration) - Date.now()) / (1000 * 60 * 60 * 24));
-            document.getElementById('countdown').innerText = remaining + " দিন বাকি";
-            document.getElementById('vaultInfo').innerText = "Wallet: " + vault.owner;
+            const fileContainer = document.getElementById('viewFiles');
+            fileContainer.innerHTML = "<strong>সংরক্ষিত ফাইল:</strong>";
+            decryptedData.files.forEach(f => {
+                fileContainer.innerHTML += `
+                    <div class="asset-item">
+                        <i class="fa-solid fa-file"></i> 
+                        <a href="${f.data}" target="_blank">${f.name}</a> (ক্লিক করে দেখুন)
+                    </div>`;
+            });
+        } catch (e) {
+            alert("ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।");
+        }
+    }
+
+    function render() {
+        const stored = localStorage.getItem('digital_will_v2');
+        if(stored) {
+            document.getElementById('setup-section').classList.add('hidden');
+            document.getElementById('active-section').classList.remove('hidden');
+            const data = JSON.parse(stored);
+            const daysLeft = Math.ceil(((data.lastSeen + data.interval) - Date.now()) / (1000 * 60 * 60 * 24));
+            document.getElementById('vaultStatusText').innerText = `পরবর্তী চেক-ইন ${daysLeft} দিনের মধ্যে করতে হবে।`;
         }
     }
 
     function checkIn() {
-        let vault = JSON.parse(localStorage.getItem('solana_digital_will'));
-        vault.lastSeen = Date.now();
-        localStorage.setItem('solana_digital_will', JSON.stringify(vault));
-        alert("চেক-ইন সম্পন্ন হয়েছে!");
-        renderUI();
+        let data = JSON.parse(localStorage.getItem('digital_will_v2'));
+        data.lastSeen = Date.now();
+        localStorage.setItem('digital_will_v2', JSON.stringify(data));
+        alert("চেক-ইন সফল!");
+        render();
     }
 
-    window.onload = renderUI;
+    function resetVault() {
+        if(confirm("সব ফাইল মুছে যাবে। নিশ্চিত?")) {
+            localStorage.removeItem('digital_will_v2');
+            location.reload();
+        }
+    }
+
+    window.onload = render;
 </script>
 
 </body>
