@@ -12,12 +12,12 @@
     
     <style>
         :root { --primary: #020617; --accent: #2563eb; --solana: #14f195; --glass: rgba(15, 23, 42, 0.98); --text: #f1f5f9; }
-        body { font-family: 'Inter', sans-serif; background: #020617; color: var(--text); margin: 0; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: #020617; color: var(--text); margin: 0; }
         .nav { background: #0f172a; padding: 1.2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); }
-        .logo { font-size: 1.3rem; font-weight: 900; letter-spacing: 2px; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo { font-size: 1.3rem; font-weight: 900; letter-spacing: 2px; color: white; text-decoration: none; }
         .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
         .card { background: var(--glass); border-radius: 20px; padding: 2.5rem; border: 1px solid #1e293b; margin-bottom: 2rem; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        h2 { font-size: 1rem; color: var(--solana); display: flex; align-items: center; gap: 10px; text-transform: uppercase; margin-bottom: 20px; }
+        h2 { font-size: 1rem; color: var(--solana); text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
         input, textarea, select { width: 100%; padding: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: white; box-sizing: border-box; }
@@ -27,7 +27,6 @@
         .file-list { margin-top: 15px; padding: 15px; background: #020617; border-radius: 10px; border: 1px dashed #334155; font-size: 0.85rem; }
         .hidden { display: none; }
         .timer { font-size: 4.5rem; font-weight: 900; color: var(--solana); margin: 10px 0; }
-        .nominee-alert { background: #7f1d1d; color: #fecaca; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
@@ -41,15 +40,15 @@
     
     <div id="setup-view">
         <div class="card">
-            <h2><i class="fa-solid fa-user-shield"></i> 1. Identity & Security</h2>
+            <h2><i class="fa-solid fa-user-shield"></i> 1. Security Keys</h2>
             <div class="grid">
-                <input type="password" id="masterKey" placeholder="Legacy Master Key">
+                <input type="password" id="masterKey" placeholder="Legacy Master Key (8+ chars)">
                 <input type="email" id="ownerEmail" placeholder="Your Email">
             </div>
         </div>
         <div class="card">
-            <h2><i class="fa-solid fa-box-archive"></i> 2. The Vault</h2>
-            <textarea id="vaultData" rows="5" placeholder="Enter bank info, recovery phrases, etc..."></textarea>
+            <h2><i class="fa-solid fa-box-archive"></i> 2. Vault Content</h2>
+            <textarea id="vaultData" rows="5" placeholder="Enter sensitive info (codes, phrases, etc)"></textarea>
             <input type="file" id="fileInput" multiple onchange="handleFiles(this.files)" style="margin-top:15px;">
             <div id="fileStatus" class="file-list hidden"></div>
         </div>
@@ -63,28 +62,25 @@
                 </select>
                 <input type="email" id="nomineeEmail" placeholder="Nominee Email">
             </div>
-            <button class="btn btn-primary" style="margin-top:25px;" onclick="sealVault()">SEAL WILL</button>
+            <button class="btn btn-primary" style="margin-top:25px;" id="sealBtn" onclick="sealVault()">SEAL WILL</button>
         </div>
     </div>
 
     <div id="active-view" class="hidden">
         <div class="card" style="text-align: center;">
-            <div style="color: var(--solana); font-weight: 800;">VAULT STATUS: ACTIVE</div>
+            <div style="color: var(--solana); font-weight: 800;">HEARTBEAT MONITORING</div>
             <div id="timerDisplay" class="timer">--</div>
-            <p style="opacity: 0.6;">Until automated nominee access</p>
-            <button class="btn btn-primary" onclick="checkIn()"><i class="fa-solid fa-heartbeat"></i> I AM ALIVE (CHECK-IN)</button>
-            <button class="btn" style="background:transparent; color:#64748b; margin-top:20px;" onclick="wipe()">WIPE VAULT</button>
+            <button class="btn btn-primary" onclick="checkIn()"><i class="fa-solid fa-heart"></i> I AM ALIVE</button>
+            <button class="btn" style="background:transparent; color:#64748b; margin-top:20px;" onclick="wipe()">WIPE ALL DATA</button>
         </div>
     </div>
 
     <div id="portal-view" class="hidden">
         <div class="card">
-            <div class="nominee-alert">ACCESS GRANTED: HEARTBEAT EXPIRED</div>
-            <h2><i class="fa-solid fa-key"></i> Nominee Verification</h2>
-            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom:20px;">The owner's heartbeat has timed out. Enter the Master Key provided to you to unlock the assets.</p>
-            <input type="password" id="unlockKey" placeholder="Enter Master Key" style="margin-bottom:15px; border-color:var(--accent);">
-            <button class="btn btn-primary" onclick="unlock()">VERIFY & DECRYPT</button>
-            
+            <h2 style="color: var(--accent);"><i class="fa-solid fa-key"></i> Nominee Access</h2>
+            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom:20px;">Verification required. Enter the Master Key to unlock.</p>
+            <input type="password" id="unlockKey" placeholder="Master Key" style="margin-bottom:15px; border-color:var(--accent);">
+            <button class="btn btn-primary" onclick="unlock()">DECRYPT VAULT</button>
             <div id="results" class="hidden" style="margin-top:30px; border-top:1px solid #334155; padding-top:20px;">
                 <div id="textResult" style="white-space:pre-wrap; background:#020617; padding:20px; border-radius:12px; font-family:monospace;"></div>
                 <div id="fileLinks" style="margin-top:20px;"></div>
@@ -94,62 +90,67 @@
 </div>
 
 <script>
-    const API = { 
-        PUBLIC: "UjQcyAneLY2BmOV1Z", 
-        SERVICE: "service_andok0r", 
-        TEMPLATE: "template_3xoxzb9" 
-    };
-
+    const API = { PUBLIC: "UjQcyAneLY2BmOV1Z", SERVICE: "service_andok0r", TEMPLATE: "template_3xoxzb9" };
     emailjs.init(API.PUBLIC);
-    let files = [];
+    let stagedFiles = [];
 
     async function connectSolana() {
         if (window.solana) {
             const resp = await window.solana.connect();
-            const btn = document.getElementById('walletBtn');
-            btn.innerText = "WALLET: " + resp.publicKey.toString().slice(0,4) + "...";
-            btn.style.background = "#14f195"; btn.style.color = "#000";
+            document.getElementById('walletBtn').innerText = "CONNECTED";
         }
     }
 
     function handleFiles(fList) {
-        files = [];
+        stagedFiles = [];
         const status = document.getElementById('fileStatus');
-        status.innerHTML = "<strong>Staged Files:</strong><br>";
+        status.innerHTML = "<strong>Staging Files...</strong>";
         status.classList.remove('hidden');
-        for (let f of fList) {
+        
+        Array.from(fList).forEach(f => {
             const r = new FileReader();
             r.onload = (e) => { 
-                files.push({ name: f.name, data: e.target.result });
-                status.innerHTML += "✓ " + f.name + "<br>";
+                stagedFiles.push({ name: f.name, data: e.target.result });
+                status.innerHTML = `<strong>Ready:</strong> ${stagedFiles.length} files`;
             };
             r.readAsDataURL(f);
-        }
+        });
     }
 
     function sealVault() {
         const key = document.getElementById('masterKey').value;
         const nominee = document.getElementById('nomineeEmail').value;
-        if(key.length < 8 || !nominee) return alert("Key (8+ chars) and Nominee email required.");
+        const content = document.getElementById('vaultData').value;
 
-        const data = { content: document.getElementById('vaultData').value, attachments: files };
-        const vault = {
-            payload: CryptoJS.AES.encrypt(JSON.stringify(data), key).toString(),
-            nominee: nominee,
-            owner: document.getElementById('ownerEmail').value,
-            limit: parseFloat(document.getElementById('triggerTime').value) * 86400000,
-            last: Date.now(),
-            sent: false
-        };
-        localStorage.setItem('dw_master_v7', JSON.stringify(vault));
-        render();
+        if(key.length < 8) return alert("Error: Master Key must be at least 8 characters.");
+        if(!nominee) return alert("Error: Nominee email is required.");
+
+        try {
+            const dataToEncrypt = JSON.stringify({ content, attachments: stagedFiles });
+            const encrypted = CryptoJS.AES.encrypt(dataToEncrypt, key).toString();
+            
+            const vault = {
+                payload: encrypted,
+                nominee: nominee,
+                owner: document.getElementById('ownerEmail').value,
+                limit: parseFloat(document.getElementById('triggerTime').value) * 86400000,
+                last: Date.now(),
+                sent: false
+            };
+            
+            localStorage.setItem('dw_v8', JSON.stringify(vault));
+            render();
+        } catch (e) {
+            alert("Encryption failed. Try with fewer/smaller files.");
+            console.error(e);
+        }
     }
 
     function render() {
-        const stored = localStorage.getItem('dw_master_v7');
-        const isNomineeLink = new URLSearchParams(window.location.search).get('mode') === 'nominee';
+        const params = new URLSearchParams(window.location.search);
+        const stored = localStorage.getItem('dw_v8');
 
-        if (isNomineeLink) {
+        if (params.get('mode') === 'nominee') {
             show('portal-view'); return;
         }
 
@@ -157,16 +158,16 @@
             show('setup-view'); return;
         }
 
-        const vault = JSON.parse(stored);
-        const remaining = (vault.last + vault.limit) - Date.now();
+        const v = JSON.parse(stored);
+        const remaining = (v.last + v.limit) - Date.now();
 
         if (remaining <= 0) {
             show('portal-view');
-            if (!vault.sent) trigger(vault);
+            if (!v.sent) trigger(v);
         } else {
             show('active-view');
             const mins = Math.ceil(remaining / 60000);
-            document.getElementById('timerDisplay').innerText = vault.limit < 3600000 ? mins + "m" : Math.ceil(mins/1440) + "d";
+            document.getElementById('timerDisplay').innerText = v.limit < 3600000 ? mins + "m" : Math.ceil(mins/1440) + "d";
         }
     }
 
@@ -175,22 +176,22 @@
         document.getElementById(id).classList.remove('hidden');
     }
 
-    function trigger(vault) {
-        vault.sent = true;
-        localStorage.setItem('dw_master_v7', JSON.stringify(vault));
+    function trigger(v) {
+        v.sent = true;
+        localStorage.setItem('dw_v8', JSON.stringify(v));
         const link = window.location.origin + window.location.pathname + "?mode=nominee";
         
         emailjs.send(API.SERVICE, API.TEMPLATE, {
-            beneficiary_email: vault.nominee,
-            message: "LEGACY TRIGGER: The heartbeat has stopped. Access the vault here: " + link
-        }).then(() => alert("Email sent to nominee."));
+            beneficiary_email: v.nominee,
+            message: "HEARTBEAT EXPIRED. Access the legacy vault here: " + link
+        }).then(() => alert("Notification sent to nominee."));
     }
 
     function unlock() {
         const key = document.getElementById('unlockKey').value;
-        const vault = JSON.parse(localStorage.getItem('dw_master_v7'));
+        const v = JSON.parse(localStorage.getItem('dw_v8'));
         try {
-            const bytes = CryptoJS.AES.decrypt(vault.payload, key);
+            const bytes = CryptoJS.AES.decrypt(v.payload, key);
             const dec = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
             document.getElementById('results').classList.remove('hidden');
             document.getElementById('textResult').innerText = dec.content;
@@ -203,16 +204,16 @@
     }
 
     function checkIn() {
-        let v = JSON.parse(localStorage.getItem('dw_master_v7'));
+        let v = JSON.parse(localStorage.getItem('dw_v8'));
         v.last = Date.now(); v.sent = false;
-        localStorage.setItem('dw_master_v7', JSON.stringify(v));
+        localStorage.setItem('dw_v8', JSON.stringify(v));
         render();
     }
 
-    function wipe() { if(confirm("Wipe everything?")) { localStorage.clear(); location.reload(); } }
+    function wipe() { if(confirm("Permanently delete vault?")) { localStorage.clear(); location.reload(); } }
 
     window.onload = render;
-    setInterval(render, 10000);
+    setInterval(render, 30000);
 </script>
 </body>
 </html>
